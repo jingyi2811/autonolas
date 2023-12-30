@@ -7,6 +7,8 @@ import {IToken} from "./interfaces/IToken.sol";
 import {ITokenomics} from "./interfaces/ITokenomics.sol";
 import {ITreasury} from "./interfaces/ITreasury.sol";
 
+import "forge-std/console.sol";
+
 /*
 * In this contract we consider OLAS tokens. The initial numbers will be as follows:
 *  - For the first 10 years there will be the cap of 1 billion (1e27) tokens;
@@ -229,6 +231,7 @@ contract Depository is IErrorsTokenomics {
 
         // Push newly created bond product into the list of products
         productId = productCounter;
+
         mapBondProducts[productId] = Product(uint160(priceLP), uint32(vesting), token, uint96(supply));
         // Even if we create a bond product every second, 2^32 - 1 is enough for the next 136 years
         productCounter = uint32(productId + 1);

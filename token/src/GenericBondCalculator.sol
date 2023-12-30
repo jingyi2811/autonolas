@@ -4,6 +4,7 @@ pragma solidity ^0.8.18;
 import {mulDiv} from "@prb/math/src/Common.sol";
 import "./interfaces/ITokenomics.sol";
 import "./interfaces/IUniswapV2Pair.sol";
+import "forge-std/console.sol";
 
 /// @dev Value overflow.
 /// @param provided Overflow value.
@@ -46,6 +47,8 @@ contract GenericBondCalculator {
     function calculatePayoutOLAS(uint256 tokenAmount, uint256 priceLP) external view
         returns (uint256 amountOLAS)
     {
+        console.log(111);
+
         // The result is divided by additional 1e18, since it was multiplied by in the current LP price calculation
         // The resulting amountDF can not overflow by the following calculations: idf = 64 bits;
         // priceLP = 2 * r0/L * 10^18 = 2*r0*10^18/sqrt(r0*r1) ~= 61 + 96 - sqrt(96 * 112) ~= 53 bits (if LP is balanced)
@@ -61,6 +64,7 @@ contract GenericBondCalculator {
         }
         // Amount with the discount factor is IDF * priceLP * tokenAmount / 1e36
         // At this point of time IDF is bound by the max of uint64, and totalTokenValue is no bigger than the max of uint192
+
         amountOLAS = ITokenomics(tokenomics).getLastIDF() * totalTokenValue / 1e36;
     }
 
