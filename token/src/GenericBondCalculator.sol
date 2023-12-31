@@ -47,8 +47,6 @@ contract GenericBondCalculator {
     function calculatePayoutOLAS(uint256 tokenAmount, uint256 priceLP) external view
         returns (uint256 amountOLAS)
     {
-        console.log(111);
-
         // The result is divided by additional 1e18, since it was multiplied by in the current LP price calculation
         // The resulting amountDF can not overflow by the following calculations: idf = 64 bits;
         // priceLP = 2 * r0/L * 10^18 = 2*r0*10^18/sqrt(r0*r1) ~= 61 + 96 - sqrt(96 * 112) ~= 53 bits (if LP is balanced)

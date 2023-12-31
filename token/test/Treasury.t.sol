@@ -55,16 +55,11 @@ contract TreasuryTest is BaseSetup {
     }
 
     function testAmount() public {
-        // toggle DAI as reserve token (as example)
         treasury.enableToken(address(dai));
 
-        // Deposit 10,000 DAI to treasury, 1,000 OLAS gets minted to deployer with 9000 as excess reserves (ready to be minted)
         uint256 daiAmount = 10_000e18;
         uint256 olasAmount = 1000e18;
         vm.prank(deployer);
         treasury.depositTokenForOLAS(deployer, daiAmount, address(dai), olasAmount);
-//
-//        // Check that the requested minted amount of OLAS corresponds to its total supply
-//        assertEq(olas.totalSupply(), olasAmount);
     }
 }

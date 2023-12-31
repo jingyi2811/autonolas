@@ -108,6 +108,6 @@ contract TokenomicsTest is BaseSetup {
         super.setUp();
     }
 
-    function myTest() public {
+    function testMy() public {
     }
 }
