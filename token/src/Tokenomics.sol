@@ -887,13 +887,13 @@ contract Tokenomics is TokenomicsConstants, IErrorsTokenomics {
     function checkpoint() external returns (bool) {
         // Get the implementation address that was written to the proxy contract
         address implementation;
-        assembly {
-            implementation := sload(PROXY_TOKENOMICS)
-        }
-        // Check if there is any address in the PROXY_TOKENOMICS address slot
-        if (implementation == address(0)) {
-            revert DelegatecallOnly();
-        }
+//        assembly {
+//            implementation := sload(PROXY_TOKENOMICS)
+//        }
+//        // Check if there is any address in the PROXY_TOKENOMICS address slot
+//        if (implementation == address(0)) {
+//            revert DelegatecallOnly();
+//        }
 
         // Check the last donation block number to avoid the possibility of a flash loan attack
         if (lastDonationBlockNumber == block.number) {

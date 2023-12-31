@@ -100,5 +100,7 @@ contract TokenomicsTest is BaseSetup {
             address(mockServiceRegistry),
             address(donatorBlacklist)
         );
+
+        t.checkpoint();
     }
 }
