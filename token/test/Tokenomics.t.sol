@@ -11,6 +11,11 @@ import "../src/test/MockTokenomics.sol";
 import {MockERC20} from "../lib/zuniswapv2/lib/solmate/src/test/utils/mocks/MockERC20.sol";
 import "../src/Treasury.sol";
 import "forge-std/console.sol";
+import "../src/Tokenomics.sol";
+import "../src/Dispenser.sol";
+import "../src/test/MockVE.sol";
+import "../src/test/MockRegistry.sol";
+import {DonatorBlacklist} from "../src/DonatorBlacklist.sol";
 
 contract BaseSetup is Test {
     Utils internal utils;
@@ -22,6 +27,12 @@ contract BaseSetup is Test {
     Treasury internal treasury;
     Depository internal depository;
     GenericBondCalculator internal genericBondCalculator;
+    Dispenser internal dispenser;
+    MockVE internal mockVE;
+    MockRegistry internal mockComponentRegistry;
+    MockRegistry internal mockAgentRegistry;
+    MockRegistry internal mockServiceRegistry;
+    DonatorBlacklist internal donatorBlacklist;
 
     address payable[] internal users;
     address internal deployer;
@@ -41,65 +52,31 @@ contract BaseSetup is Test {
 
     function setUp() public virtual {
         utils = new Utils();
-        users = utils.createUsers(2);
+        users = utils.create2Users();
 
         deployer = users[0];
         vm.label(deployer, "Deployer");
         dev = users[1];
         vm.label(dev, "Developer");
 
-        // Get tokens and their initial mint
         olas = new MockERC20("OLAS Token", "OLAS", 18);
         olas.mint(address(this), initialMint);
         dai = new MockERC20("DAI Token", "DAI", 18);
         dai.mint(address(this), initialMint);
 
-        // Deploying depository, treasury and mock tokenomics contracts
-        tokenomics = new MockTokenomics();
-        // Correct depository address is missing here, it will be defined just one line below
+         tokenomics = new MockTokenomics();
         treasury = new Treasury(address(olas), address(tokenomics), deployer, deployer);
-        // Deploy generic bond calculator contract
         genericBondCalculator = new GenericBondCalculator(address(olas), address(tokenomics));
-        // Deploy depository contract
         depository = new Depository(address(olas), address(tokenomics), address(treasury), address(genericBondCalculator));
-        // Change depository contract addresses to the correct ones
-        treasury.changeManagers(address(0), address(depository), address(0));
 
-        // Deploy factory and router
-        factory = new ZuniswapV2Factory();
-        router = new ZuniswapV2Router(address(factory));
+        dispenser = new Dispenser(address(tokenomics), address(treasury));
+        donatorBlacklist = new DonatorBlacklist();
+        mockVE = new MockVE();
 
-        // Create LP token
-        factory.createPair(address(olas), address(dai));
-        // Get the LP token address
-        pair = factory.pairs(address(olas), address(dai));
-
-        // Add liquidity
-        olas.approve(address(router), largeApproval);
-        dai.approve(address(router), largeApproval);
-
-        (, , initialLiquidity) = router.addLiquidity(
-            address(dai),
-            address(olas),
-            amountDAI,
-            amountOLAS,
-            amountDAI,
-            amountOLAS,
-            address(this)
-        );
-
-        // Enable LP token in treasury
-        treasury.enableToken(pair);
-        uint256 priceLP = depository.getCurrentPriceLP(pair);
-
-        // Create bond product
-        depository.create(pair, priceLP, supplyProductOLAS, vesting);
-
-        // Give large approvals to accounts
-        vm.prank(deployer);
-        ZuniswapV2Pair(pair).approve(address(treasury), largeApproval);
-        vm.prank(dev);
-        ZuniswapV2Pair(pair).approve(address(treasury), largeApproval);
+        mockComponentRegistry = new MockRegistry();
+        mockAgentRegistry = new MockRegistry();
+        mockServiceRegistry = new MockRegistry();
+        donatorBlacklist = new DonatorBlacklist();
     }
 }
 
@@ -109,5 +86,19 @@ contract TokenomicsTest is BaseSetup {
     }
 
     function testMy() public {
+        Tokenomics t = new Tokenomics();
+
+        t.initializeTokenomics(
+            address(olas),
+            address(treasury),
+            address(depository),
+            address(dispenser),
+            address(mockVE),
+            1 weeks,
+            address(mockComponentRegistry),
+            address(mockAgentRegistry),
+            address(mockServiceRegistry),
+            address(donatorBlacklist)
+        );
     }
 }

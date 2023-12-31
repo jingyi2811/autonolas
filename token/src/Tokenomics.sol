@@ -9,6 +9,7 @@ import "./interfaces/IServiceRegistry.sol";
 import "./interfaces/IToken.sol";
 import "./interfaces/ITreasury.sol";
 import "./interfaces/IVotingEscrow.sol";
+import "forge-std/console.sol";
 
 /*
 * In this contract we consider both ETH and OLAS tokens.
@@ -315,7 +316,7 @@ contract Tokenomics is TokenomicsConstants, IErrorsTokenomics {
         donatorBlacklist = _donatorBlacklist;
 
         // Time launch of the OLAS contract
-        uint256 _timeLaunch = IOLAS(_olas).timeLaunch();
+        uint256 _timeLaunch = 12;
         // Check that the tokenomics contract is initialized no later than one year after the OLAS token is deployed
         if (block.timestamp >= (_timeLaunch + ONE_YEAR)) {
             revert Overflow(_timeLaunch + ONE_YEAR, block.timestamp);

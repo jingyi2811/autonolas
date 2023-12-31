@@ -27,6 +27,29 @@ contract Utils is Test {
         return users;
     }
 
+    function create2Users()
+    external
+    returns (address payable[] memory)
+    {
+        address payable[] memory users = new address payable[](2);
+
+        {
+            // User1
+            address payable user = payable(address(0x01));
+            vm.deal(user, 100 ether);
+            users[0] = user;
+        }
+
+        {
+            // User2
+            address payable user = payable(address(0x02));
+            vm.deal(user, 100 ether);
+            users[1] = user;
+        }
+
+        return users;
+    }
+
     // move block.number forward by a given number of blocks
     function mineBlocks(uint256 numBlocks) external {
         uint256 targetBlock = block.number + numBlocks;
